@@ -1,51 +1,45 @@
-# Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022)
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-
 import streamlit as st
-from streamlit.logger import get_logger
+import requests
+import pandas as pd
 
-LOGGER = get_logger(__name__)
+@st.cache_resource
+def load_data():
+  url = 'https://www.twse.com.tw/rwd/zh/afterTrading/MI_INDEX?date=20240429&type=17&response=json&_=1714387790744'
+  r = requests.get(url)
+  data = r.json()['tables'][8]
+  df = pd.DataFrame(data['data'], columns=data['fields'])
+  return df
 
-
-def run():
-    st.set_page_config(
-        page_title="Hello",
-        page_icon="👋",
-    )
-
-    st.write("# Welcome to Streamlit! 👋")
-
-    st.sidebar.success("Select a demo above.")
-
-    st.markdown(
-        """
-        Streamlit is an open-source app framework built specifically for
-        Machine Learning and Data Science projects.
-        **👈 Select a demo from the sidebar** to see some examples
-        of what Streamlit can do!
-        ### Want to learn more?
-        - Check out [streamlit.io](https://streamlit.io)
-        - Jump into our [documentation](https://docs.streamlit.io)
-        - Ask a question in our [community
-          forums](https://discuss.streamlit.io)
-        ### See more complex demos
-        - Use a neural net to [analyze the Udacity Self-driving Car Image
-          Dataset](https://github.com/streamlit/demo-self-driving)
-        - Explore a [New York City rideshare dataset](https://github.com/streamlit/demo-uber-nyc-pickups)
-    """
-    )
+# Load the data
+df = load_data()
 
 
-if __name__ == "__main__":
-    run()
+col1, col2 = st.columns(2)
+stock = col1.selectbox("證券名稱", df['證券名稱'], index=2)
+stock_number = df.loc[df['證券名稱'] == stock, '證券代號'].values[0]
+col2.text_input("證券代號", stock_number, disabled=True)
+
+closing_price = float(df.loc[df['證券名稱'] == stock, '收盤價'].values[0])
+cash_dividend = 0.4
+stock_dividend = 0.56
+
+col1, col2, col3 = st.columns(3)
+col1.text_input("收盤價", closing_price, disabled=True)
+col2.text_input("現金股利", cash_dividend, disabled=True)
+col3.text_input("股票股利", stock_dividend, disabled=True)
+
+have_stock_number = st.number_input("持有張數", step=1)
+
+col1, col2 = st.columns(2)
+total_cash = int(have_stock_number * cash_dividend * 1000)
+total_stock = int(have_stock_number * stock_dividend * 100)
+col1.text_input("現金股利(總額)", total_cash, disabled=True)
+col2.text_input("股票股利(總額)", total_stock, disabled=True)
+
+
+
+col1, col2 = st.columns(2)
+total_cash_transfer = int((total_stock * closing_price) + total_cash)
+total_stock_transfer = int((total_cash / closing_price) + total_stock)
+col1.text_input("換算台幣", total_cash_transfer, disabled=True)
+col2.text_input("換算股票", total_stock_transfer, disabled=True)
