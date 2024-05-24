@@ -2,7 +2,7 @@ import streamlit as st
 import requests
 import pandas as pd
 
-@st.cache_resource
+@st.cache_resource(ttl=60s)
 def load_data():
   url = 'https://www.twse.com.tw/rwd/zh/afterTrading/MI_INDEX?date=20240429&type=17&response=json&_=1714387790744'
   r = requests.get(url)
