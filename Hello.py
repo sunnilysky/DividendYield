@@ -1,10 +1,13 @@
 import streamlit as st
 import requests
 import pandas as pd
+import datetime
 
 @st.cache_resource(ttl=60s)
 def load_data():
-  url = 'https://www.twse.com.tw/rwd/zh/afterTrading/MI_INDEX?date=20240429&type=17&response=json&_=1714387790744'
+  today = datetime.date.today()
+  date_str = today.strftime('%Y%m%d')
+  url = url = f'https://www.twse.com.tw/rwd/zh/afterTrading/MI_INDEX?date={date_str}&type=17&response=json&_=1714387790744'
   r = requests.get(url)
   data = r.json()['tables'][8]
   df = pd.DataFrame(data['data'], columns=data['fields'])
