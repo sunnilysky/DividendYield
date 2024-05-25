@@ -8,7 +8,7 @@ import datetime
 
 # 收盤價
 # https://www.twse.com.tw/rwd/zh/afterTrading/MI_INDEX?date=&type=17&response=json
-@st.cache()
+@st.cache_resource
 def load_data_closing_price():
     
     url = f'https://www.twse.com.tw/rwd/zh/afterTrading/MI_INDEX?date=&type=17&response=json'
@@ -19,7 +19,7 @@ def load_data_closing_price():
     return df
 
 
-@st.cache()
+@st.cache_resource
 def load_data_dividend_yield():
     
     url = f'https://www.twse.com.tw/exchangeReport/BWIBBU_d?response=json&date='
@@ -48,8 +48,9 @@ dividend_yield = df_dy.loc[df_dy['證券名稱'] == stock, r'殖利率(%)'].valu
 # dividend_yield = (cash_dividend + stock_dividend)/closing_price * 100
 
 if stock_number == '2812':
+  st.header("")
   col1, col2, col3, col4 = st.columns(4)
-  col1.text_input("收盤價", closing_price, disabled=True)
+  col1.text_input("收盤價", closing_price)
   col2.text_input("現金股利", cash_dividend)
   col3.text_input("股票股利", stock_dividend)
   col4.text_input("殖利率", dividend_yield, disabled=True)
