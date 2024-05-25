@@ -3,15 +3,23 @@ import requests
 import pandas as pd
 import datetime
 
-@st.cache(ttl=60)
+@st.cache()
 def load_data():
-  today = datetime.date.today()
-  date_str = today.strftime('%Y%m%d')
-  url = url = f'https://www.twse.com.tw/rwd/zh/afterTrading/MI_INDEX?date={date_str}&type=17&response=json&_=1714387790744'
-  r = requests.get(url)
-  data = r.json()['tables'][8]
-  df = pd.DataFrame(data['data'], columns=data['fields'])
-  return df
+    today = datetime.date.today()
+    
+    # Check if today is Saturday (5) or Sunday (6)
+    if today.weekday() == 5:  # Saturday
+        today = today - datetime.timedelta(days=1)
+    elif today.weekday() == 6:  # Sunday
+        today = today - datetime.timedelta(days=2)
+
+    date_str = today.strftime('%Y%m%d')
+    url = f'https://www.twse.com.tw/rwd/zh/afterTrading/MI_INDEX?date={date_str}&type=17&response=json&_=1714387790744'
+    print(url)
+    r = requests.get(url)
+    data = r.json()['tables'][8]
+    df = pd.DataFrame(data['data'], columns=data['fields'])
+    return df
 
 # Load the data
 df = load_data()
@@ -25,11 +33,13 @@ col2.text_input("證券代號", stock_number, disabled=True)
 closing_price = float(df.loc[df['證券名稱'] == stock, '收盤價'].values[0])
 cash_dividend = 0.4
 stock_dividend = 0.56
+dividend_yield = (cash_dividend + stock_dividend)/closing_price * 100
 
-col1, col2, col3 = st.columns(3)
+col1, col2, col3, col4 = st.columns(4)
 col1.text_input("收盤價", closing_price, disabled=True)
 col2.text_input("現金股利", cash_dividend, disabled=True)
 col3.text_input("股票股利", stock_dividend, disabled=True)
+col4.text_input("殖利率", f'{dividend_yield:.2f} %', disabled=True)
 
 have_stock_number = st.number_input("持有張數", step=1)
 
