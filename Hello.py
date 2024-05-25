@@ -8,7 +8,7 @@ import datetime
 
 # 收盤價
 # https://www.twse.com.tw/rwd/zh/afterTrading/MI_INDEX?date=&type=17&response=json
-@st.cache_resource()
+@st.cache
 def load_data_closing_price():
     
     url = f'https://www.twse.com.tw/rwd/zh/afterTrading/MI_INDEX?date=&type=17&response=json'
@@ -19,7 +19,7 @@ def load_data_closing_price():
     return df
 
 
-@st.cache_resource()
+@st.cache
 def load_data_dividend_yield():
     
     url = f'https://www.twse.com.tw/exchangeReport/BWIBBU_d?response=json&date='
