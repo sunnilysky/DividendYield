@@ -41,6 +41,7 @@ col2.text_input("現金股利", cash_dividend, disabled=True)
 col3.text_input("股票股利", stock_dividend, disabled=True)
 col4.text_input("殖利率", f'{dividend_yield:.2f} %', disabled=True)
 
+st.text_input("提醒", '六日使用自動抓取禮拜五收盤價，股利數據尚無自動更新(目前是台中銀)', disabled=True)
 have_stock_number = st.number_input("持有張數", step=1)
 
 col1, col2 = st.columns(2)
