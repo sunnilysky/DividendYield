@@ -3,7 +3,7 @@ import requests
 import pandas as pd
 import datetime
 
-@st.cache_resource(ttl=60s)
+@st.cache(ttl=60)
 def load_data():
   today = datetime.date.today()
   date_str = today.strftime('%Y%m%d')
